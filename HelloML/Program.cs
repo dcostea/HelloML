@@ -28,40 +28,41 @@ namespace HelloML
                     new TextLoader.Column("Label", DataKind.TX, 2)
                 },
             });
+            Console.WriteLine("Loading training data...");
             var trainingDataView = reader.Read(sampleCsv);
 
             // train the model
             var trainingPipeline = Context.Transforms.Concatenate("Features", "MinHour", "MaxHour")
                 .Append(Context.Transforms.Conversion.MapValueToKey("Label"), TransformerScope.Everything)
                 .Append(Context.MulticlassClassification.Trainers.LogisticRegression())
+                //.Append(Context.MulticlassClassification.Trainers.StochasticDualCoordinateAscent())
                 .Append(Context.Transforms.Conversion.MapKeyToValue(("PredictedLabel", "PredictedLabel")));
 
+            Console.WriteLine("Training the model...");
             Model = trainingPipeline.Fit(trainingDataView);
 
             // predict data
+            Console.WriteLine("Predict some data...");
             var sample1 = new SourceData
             {
                 MinHour = 22,
                 MaxHour = 23
             };
-            Console.WriteLine($"Predict greeting for interval {sample1.MinHour} - {sample1.MaxHour}:");
-            Console.WriteLine($"{Predict(sample1).PredictedLabel}");
+            Console.WriteLine($"Predict greeting for interval {sample1.MinHour} - {sample1.MaxHour}: {Predict(sample1).PredictedLabel}");
 
             var sample2 = new SourceData
             {
                 MinHour = 9,
                 MaxHour = 11
             };
-            Console.WriteLine($"Predict greeting for interval {sample2.MinHour} - {sample2.MaxHour}:");
-            Console.WriteLine($"{Predict(sample2).PredictedLabel}");
+            Console.WriteLine($"Predict greeting for interval {sample2.MinHour} - {sample2.MaxHour}: {Predict(sample2).PredictedLabel}");
 
             var sample3 = new SourceData
             {
                 MinHour = 16,
                 MaxHour = 17
             };
-            Console.WriteLine($"Predict greeting for interval {sample3.MinHour} - {sample3.MaxHour}:");
-            Console.WriteLine($"{Predict(sample3).PredictedLabel}");
+            Console.WriteLine($"Predict greeting for interval {sample3.MinHour} - {sample3.MaxHour}: {Predict(sample3).PredictedLabel}");
 
 
             Console.WriteLine("\nPress any key to continue...");
